@@ -3,18 +3,19 @@ require 'thor'
 
 module Fag
   class CLI < Thor
-    desc "camelize {snake_case_string}", "convert {snake_case_string} to {camelCaseString}"
-    def camelize(str)
-      puts str.split("_").map{|w| w[0] = w[0].upcase; w}.join
-    end
-
-    desc "snake {CamelCaseString}", "convert {CamelCaseString} to {snake_case_string}"
-    def snake(str)
-      puts str
-             .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-             .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-             .tr("-", "_")
-             .downcase
+    desc "ag", "aggregate folder separated files to numbered files."
+    def a(indir, outdir)
+      index = 1
+      dirs = Dir.glob("#{indir}/*/").sort
+      dirs.each do |dir|
+        files = Dir.glob("#{dir}/*.*").sort
+        files.each do |src|
+          extname = File.extname(src)
+          fn = sprintf("F%08d#{extname}", index)
+          FileUtils.mv(src, "#{outdir}/#{fn}")
+          index += 1
+        end
+      end
     end
   end
 end
